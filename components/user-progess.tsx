@@ -33,7 +33,7 @@ export const UserProgress = ({
       <Link href="/shop">
         <Button className="text-orange-500" variant="ghost">
           <Image
-            src="/lighting.png"
+            src="/points.png"
             height={28}
             width={28}
             alt="points"
