@@ -3,12 +3,14 @@
 import { toast } from "sonner";
 import Image from "next/image";
 import Confetti from "react-confetti"
-import { useAudio, useWindowSize } from "react-use";
+import { useAudio, useWindowSize, useMount } from "react-use";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { reduceHearts } from "@/actions/user-progress";
-import { challengeOptions, challenges } from "@/db/schema";
+import { useHeartsModal } from "@/store/use-hearts-modal";
+import { usePracticeModal } from "@/store/use-practice-modal";
+import { challengeOptions, challenges, userSubscription } from "@/db/schema";
 import { upsertChallengeProgress } from "@/actions/challenge-progress";
 
 import { Header } from "./hearder";
@@ -25,7 +27,9 @@ type Props = {
     completed: boolean;
     challengeOptions: (typeof challengeOptions.$inferSelect)[];
   })[];
-  userSubscription: any; //replace with subscription DB type
+  userSubscription: typeof userSubscription.$inferSelect & {
+    isActive: boolean;
+  } | null;
 };
 
 export const Quiz = ({
@@ -35,6 +39,15 @@ export const Quiz = ({
   initialLessonChallenges,
   userSubscription,
 }: Props) => {
+  const { open: openPracticeModal } = usePracticeModal();
+  const { open: openHeartsModal } = useHeartsModal();
+  
+  useMount(() => {
+    if (initialPercentage === 100) {
+      openPracticeModal();
+    }
+  })
+
   const { width, height } = useWindowSize();
 
   const router = useRouter();
@@ -46,7 +59,9 @@ export const Quiz = ({
   const [pending, startTransition] = useTransition();
   const [hearts, setHearts] = useState(initialHearts);
   const [lessonId] = useState(initialLessonId);
-  const [percentage, setPercentage] = useState(initialPercentage);
+  const [percentage, setPercentage] = useState(() => {
+    return initialPercentage === 100 ? 0 : initialPercentage;
+  });
   const [challenges] = useState(initialLessonChallenges);
   const [activeIndex, setActiveIndex] = useState(() => {
     const uncompletedIndex = challenges.findIndex(
@@ -73,8 +88,7 @@ export const Quiz = ({
 
   const onContinue = () => {
     if (hearts === 0) {
-      console.error("missing hearts");
-      // Handle the case where hearts are zero, show an error message or prevent progression
+      openHeartsModal();
       return;
     }
 
@@ -103,7 +117,7 @@ export const Quiz = ({
         upsertChallengeProgress(challenge.id)
           .then((response) => {
             if (response?.error === "hearts") {
-              console.error("missing hearts");
+              openHeartsModal();
               return;
             }
 
@@ -114,7 +128,6 @@ export const Quiz = ({
 
             if (initialPercentage === 100) {
               setHearts((prev) => Math.min(prev + 1, 10));
-              toast.success("🎉 You completed the lesson!");
             }
           })
           .catch(() => toast.error("Something went wrong"));
@@ -124,7 +137,7 @@ export const Quiz = ({
         reduceHearts(challenge.id)
           .then((response) => {
             if (response?.error === "hearts") {
-              console.error("missing hearts");
+              openHeartsModal();
               return;
             }
 

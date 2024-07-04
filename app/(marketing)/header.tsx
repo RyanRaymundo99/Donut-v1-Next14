@@ -23,7 +23,7 @@ export const Header = () => {
             className="rounded-lg"
           />
           <h1 className="text-xl font-extrabold text-skye-500 tracking-wide">
-            Daqua
+            Donut
           </h1>
         </div>
         <ClerkLoading>
