@@ -12,6 +12,8 @@ import {
 import { index } from "drizzle-orm/mysql-core";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Promo } from "@/components/promo";
+import { Quests } from "@/components/quests";
 
 const Leaderboard = async () => {
   const userProgressData = getUserProgress();
@@ -38,6 +40,8 @@ const Leaderboard = async () => {
           points={userProgress.points}
           hasActiveSubscription={isPro}
         />
+        {!isPro && <Promo />}
+        <Quests points={userProgress.points} />
       </StickyWrapper>
       <FeedWrapper>
         <div className="w-full flex flex-col items-center ">
@@ -60,11 +64,11 @@ const Leaderboard = async () => {
                   className="object-cover"
                   src={userProgress.userImgSrc}
                 />
-                  </Avatar>
-                  <p className="font-bold text-neutral-800 flex-1">
-                    {userProgress.userName}
-                  </p>
-                  <p className="text-muted-foreground">{userProgress.points} XP</p>
+              </Avatar>
+              <p className="font-bold text-neutral-800 flex-1">
+                {userProgress.userName}
+              </p>
+              <p className="text-muted-foreground">{userProgress.points} XP</p>
             </div>
           ))}
         </div>
