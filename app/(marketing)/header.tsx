@@ -31,13 +31,11 @@ export const Header = () => {
         </ClerkLoading>
         <ClerkLoaded>
           <SignedIn>
-            <UserButton afterSignOutUrl="/" />
+            <UserButton  />
           </SignedIn>
           <SignedOut>
             <SignInButton
               mode="modal"
-              afterSignInUrl="/learn"
-              afterSignUpUrl="/learn"
             >
               <Button size="lg" variant="ghost">
                 Login
